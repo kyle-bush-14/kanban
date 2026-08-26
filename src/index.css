@@ -1,1 +1,57 @@
 @import "tailwindcss";
+
+@theme {
+  /* Surfaces, from furthest back to closest to the viewer. */
+  --color-bg: oklch(0.18 0.012 265);
+  --color-surface: oklch(0.23 0.014 265);
+  --color-surface-raised: oklch(0.27 0.016 265);
+  --color-surface-hover: oklch(0.31 0.018 265);
+
+  --color-line: oklch(0.34 0.016 265);
+  --color-line-strong: oklch(0.44 0.02 265);
+
+  --color-ink: oklch(0.94 0.005 265);
+  --color-ink-muted: oklch(0.72 0.012 265);
+  --color-ink-faint: oklch(0.58 0.014 265);
+
+  --color-accent: oklch(0.68 0.16 258);
+  --color-accent-soft: oklch(0.42 0.09 258);
+
+  /* Due-date states. */
+  --color-overdue: oklch(0.68 0.18 22);
+  --color-due-soon: oklch(0.79 0.15 78);
+
+  /* The default label palette. Cards, chips and the picker all read these. */
+  --color-label-red: oklch(0.64 0.19 22);
+  --color-label-orange: oklch(0.72 0.16 60);
+  --color-label-yellow: oklch(0.82 0.15 92);
+  --color-label-green: oklch(0.68 0.16 152);
+  --color-label-blue: oklch(0.65 0.16 250);
+  --color-label-purple: oklch(0.62 0.18 305);
+
+  --radius-card: 0.625rem;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Slim scrollbars that read as part of the dark surface rather than sitting on top of it. */
+@supports (scrollbar-width: thin) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-line-strong) transparent;
+  }
+}
