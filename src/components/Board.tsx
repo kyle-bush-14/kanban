@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
-import { DragDropProvider, DragOverlay } from "@dnd-kit/react";
+import { DragDropProvider, DragOverlay, KeyboardSensor, PointerSensor } from "@dnd-kit/react";
 import { boardReducer, findColumn } from "../state/boardReducer";
 import { createSeedBoard } from "../state/seed";
 import type { ColumnId } from "../types";
@@ -8,6 +8,25 @@ import { Column } from "./Column";
 import { TaskCardContent } from "./TaskCard";
 import { TaskDialog } from "./TaskDialog";
 import { celebrate } from "../lib/confetti";
+
+/**
+ * Space picks a card up for a keyboard drag; Enter is left alone so it can open
+ * the card. dnd-kit binds both by default, which makes Enter do both at once.
+ */
+const SENSORS = [
+  PointerSensor,
+  KeyboardSensor.configure({
+    keyboardCodes: {
+      start: ["Space"],
+      cancel: ["Escape"],
+      end: ["Space", "Tab"],
+      up: ["ArrowUp"],
+      down: ["ArrowDown"],
+      left: ["ArrowLeft"],
+      right: ["ArrowRight"],
+    },
+  }),
+];
 
 export function Board() {
   const [state, dispatch] = useReducer(boardReducer, undefined, createSeedBoard);
@@ -53,6 +72,7 @@ export function Board() {
 
   return (
     <DragDropProvider
+      sensors={SENSORS}
       onDragStart={(event) => {
         // Reading state here is safe: no dispatch has run yet for this drag.
         preDragColumnsRef.current = state.columns;

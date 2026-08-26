@@ -55,7 +55,8 @@ export function LabelPicker({ labels, selectedIds, onToggle, onCreate, onRename,
         </Popover.Trigger>
 
         <Popover.Portal>
-          <Popover.Positioner sideOffset={6} align="start">
+          {/* Above the dialog's own z-50, since the picker lives inside it. */}
+          <Popover.Positioner sideOffset={6} align="start" className="z-60">
             <Popover.Popup className="bg-surface-raised border-line w-72 rounded-lg border p-3 shadow-xl outline-none">
               <p className="text-ink-muted mb-2 text-xs font-semibold tracking-wide uppercase">Board labels</p>
 

@@ -14,13 +14,11 @@ interface Props {
 }
 
 export function Column({ id, title, tasks, labels, onOpenTask, onAddTask }: Props) {
-  // A column-level droppable so empty columns still accept a card.
-  const { ref, isDropTarget } = useDroppable({
-    id: `column:${id}`,
-    type: "column",
-    accept: "task",
-    data: { column: id },
-  });
+  // A column-level droppable so empty columns still accept a card. The id must
+  // be the bare column id: @dnd-kit/helpers' `move` resolves a drop target by
+  // looking it up as a key in the column map, so a prefixed id would never
+  // match and dropping onto an empty column would silently do nothing.
+  const { ref, isDropTarget } = useDroppable({ id, type: "column", accept: "task" });
 
   return (
     <section
