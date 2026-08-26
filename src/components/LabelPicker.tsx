@@ -5,7 +5,7 @@ import { LABEL_COLORS } from "../types";
 import { LABEL_CHIP, LABEL_SWATCH } from "../lib/labelStyles";
 import { Button, TextInput } from "./ui/controls";
 import { cn } from "../lib/cn";
-import { Check, Pencil, X } from "lucide-react";
+import { Check, Pencil } from "lucide-react";
 
 interface Props {
   labels: Label[];
@@ -91,7 +91,7 @@ export function LabelPicker({ labels, selectedIds, onToggle, onCreate, onRename,
                         >
                           <span className={cn("size-3 shrink-0 rounded-sm", LABEL_SWATCH[label.color])} />
                           <span className="text-ink flex-1 truncate">{label.name}</span>
-                          {isSelected && <X size={14} />}
+                          {isSelected && <Check size={14} />}
                         </button>
                       )}
 
