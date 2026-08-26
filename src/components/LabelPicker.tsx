@@ -91,9 +91,7 @@ export function LabelPicker({ labels, selectedIds, onToggle, onCreate, onRename,
                         >
                           <span className={cn("size-3 shrink-0 rounded-sm", LABEL_SWATCH[label.color])} />
                           <span className="text-ink flex-1 truncate">{label.name}</span>
-                          {isSelected && (
-                            <X size={14} />
-                          )}
+                          {isSelected && <X size={14} />}
                         </button>
                       )}
 
@@ -103,11 +101,7 @@ export function LabelPicker({ labels, selectedIds, onToggle, onCreate, onRename,
                         aria-label={isEditing ? `Done editing ${label.name}` : `Edit ${label.name}`}
                         className="text-ink-faint hover:text-ink shrink-0 self-start rounded p-1"
                       >
-                        {isEditing ? (
-                          <Check size={14} />
-                        ) : (
-                          <Pencil size={14} />
-                        )}
+                        {isEditing ? <Check size={14} /> : <Pencil size={14} />}
                       </button>
                     </li>
                   );
@@ -157,7 +151,7 @@ function ColorSwatches({ value, onChange }: { value: LabelColor; onChange: (colo
             "size-5 rounded transition",
             LABEL_SWATCH[color],
             value === color
-              ? "ring-ink ring-2 ring-offset-2 ring-offset-surface-raised"
+              ? "ring-ink ring-offset-surface-raised ring-2 ring-offset-2"
               : "opacity-60 hover:opacity-100",
           )}
         />
