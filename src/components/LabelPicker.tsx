@@ -85,6 +85,7 @@ export function LabelPicker({ labels, selectedIds, onToggle, onCreate, onRename,
                         <button
                           type="button"
                           onClick={() => onToggle(label.id)}
+                          aria-pressed={isSelected}
                           className={cn(
                             "hover:bg-surface-hover flex flex-1 items-center gap-2 rounded px-1.5 py-1 text-left text-sm transition-colors",
                           )}
