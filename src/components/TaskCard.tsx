@@ -11,7 +11,7 @@ export function TaskCardContent({ task, labels, done }: { task: Task; labels: La
     <>
       <p
         className={cn(
-          "text-ink text-sm leading-snug font-medium break-words",
+          "text-ink text-sm leading-snug font-medium wrap-break-word",
           done && "decoration-ink-faint line-through decoration-2",
         )}
       >

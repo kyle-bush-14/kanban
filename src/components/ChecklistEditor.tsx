@@ -3,6 +3,7 @@ import { Checkbox } from "@base-ui/react/checkbox";
 import type { ChecklistItem } from "../types";
 import { Button, TextInput } from "./ui/controls";
 import { cn } from "../lib/cn";
+import { Check, X } from "lucide-react";
 
 interface Props {
   items: ChecklistItem[];
@@ -54,14 +55,12 @@ export function ChecklistEditor({ items, onAdd, onToggle, onRename, onRemove }: 
               aria-label={item.text}
               className={cn(
                 "border-line-strong flex size-4 shrink-0 items-center justify-center rounded border transition-colors",
-                "data-[checked]:border-label-green data-[checked]:bg-label-green",
+                "data-checked:border-label-green data-checked:bg-label-green",
                 "focus-visible:ring-accent/70 focus-visible:ring-2 focus-visible:outline-none",
               )}
             >
               <Checkbox.Indicator className="flex text-black">
-                <svg viewBox="0 0 16 16" className="size-3" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <path d="M3.5 8.5 6.5 11.5 12.5 4.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
+                <Check size={14} />
               </Checkbox.Indicator>
             </Checkbox.Root>
 
@@ -80,9 +79,7 @@ export function ChecklistEditor({ items, onAdd, onToggle, onRename, onRemove }: 
               aria-label={`Remove "${item.text}"`}
               className="text-ink-faint hover:text-overdue shrink-0 rounded p-0.5 opacity-0 transition group-hover:opacity-100 focus-visible:opacity-100"
             >
-              <svg viewBox="0 0 16 16" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="1.75">
-                <path d="M4 4l8 8M12 4l-8 8" strokeLinecap="round" />
-              </svg>
+              <X size={14} />
             </button>
           </li>
         ))}

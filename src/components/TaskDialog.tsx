@@ -7,6 +7,7 @@ import { ChecklistEditor } from "./ChecklistEditor";
 import { LabelPicker } from "./LabelPicker";
 import { Button, Field, TextArea, TextInput } from "./ui/controls";
 import { cn } from "../lib/cn";
+import { X } from "lucide-react";
 
 interface Props {
   task: Task | undefined;
@@ -22,13 +23,13 @@ export function TaskDialog({ task, column, labels, dispatch, onClose }: Props) {
   return (
     <Dialog.Root open={open} onOpenChange={(next) => !next && onClose()}>
       <Dialog.Portal>
-        <Dialog.Backdrop className="fixed inset-0 bg-black/60 backdrop-blur-[2px] transition-opacity duration-150 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0" />
+        <Dialog.Backdrop className="fixed inset-0 bg-black/60 backdrop-blur-[2px] transition-opacity duration-150 data-ending-style:opacity-0 data-starting-style:opacity-0" />
         <Dialog.Popup
           className={cn(
             "bg-surface border-line fixed top-1/2 left-1/2 z-50 max-h-[85vh] w-[min(34rem,calc(100vw-2rem))]",
             "-translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-xl border p-5 shadow-2xl outline-none",
-            "transition-all duration-150 data-[ending-style]:scale-95 data-[ending-style]:opacity-0",
-            "data-[starting-style]:scale-95 data-[starting-style]:opacity-0",
+            "transition-all duration-150 data-ending-style:scale-95 data-ending-style:opacity-0",
+            "data-starting-style:scale-95 data-starting-style:opacity-0",
           )}
         >
           {task && column && (
@@ -69,9 +70,7 @@ function TaskDialogBody({
           aria-label="Close"
           className="text-ink-faint hover:bg-surface-hover hover:text-ink shrink-0 rounded-md p-1.5 transition-colors"
         >
-          <svg viewBox="0 0 16 16" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.75">
-            <path d="M4 4l8 8M12 4l-8 8" strokeLinecap="round" />
-          </svg>
+          <X size={16} />
         </Dialog.Close>
       </div>
 
