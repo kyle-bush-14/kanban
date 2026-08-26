@@ -3,6 +3,7 @@ import type { ColumnId, Label, Task } from "../types";
 import { TaskCard } from "./TaskCard";
 import { Button } from "./ui/controls";
 import { cn } from "../lib/cn";
+import { Plus } from "lucide-react";
 
 interface Props {
   id: ColumnId;
@@ -41,9 +42,7 @@ export function Column({ id, title, tasks, labels, onOpenTask, onAddTask }: Prop
           title={`Add a task to ${title}`}
           className="px-1.5 py-1"
         >
-          <svg viewBox="0 0 16 16" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.75">
-            <path d="M8 3.5v9M3.5 8h9" strokeLinecap="round" />
-          </svg>
+          <Plus size={16} />
         </Button>
       </header>
 

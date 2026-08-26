@@ -2,6 +2,7 @@ import type { Label, Task } from "../types";
 import { dueStatus, formatDueDate } from "../lib/date";
 import { LABEL_CHIP } from "../lib/labelStyles";
 import { cn } from "../lib/cn";
+import { Check, Clock, Weight } from "lucide-react";
 
 const DUE_STYLES = {
   overdue: "bg-overdue/15 text-overdue",
@@ -49,7 +50,7 @@ export function CardBadges({ task, labels }: Props) {
               className="bg-surface-hover text-ink-muted inline-flex items-center gap-1 rounded px-1.5 py-0.5 font-medium"
               title={`Weight: ${task.weight}`}
             >
-              <WeightIcon />
+              <Weight size={12} />
               {task.weight}
             </span>
           )}
@@ -62,7 +63,7 @@ export function CardBadges({ task, labels }: Props) {
               )}
               title={`Due ${task.dueDate}`}
             >
-              <ClockIcon />
+              <Clock size={12} />
               {formatDueDate(task.dueDate)}
             </span>
           )}
@@ -75,38 +76,12 @@ export function CardBadges({ task, labels }: Props) {
               )}
               title={`${checklistDone} of ${checklistTotal} sub-tasks complete`}
             >
-              <CheckIcon />
+              <Check size={12} />
               {checklistDone}/{checklistTotal}
             </span>
           )}
         </div>
       )}
     </div>
-  );
-}
-
-function WeightIcon() {
-  return (
-    <svg viewBox="0 0 16 16" className="size-3" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
-      <path d="M3 13h10l-1.6-6.5H4.6L3 13Z" strokeLinejoin="round" />
-      <circle cx="8" cy="4" r="1.6" />
-    </svg>
-  );
-}
-
-function ClockIcon() {
-  return (
-    <svg viewBox="0 0 16 16" className="size-3" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
-      <circle cx="8" cy="8" r="5.75" />
-      <path d="M8 4.75V8l2.25 1.4" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function CheckIcon() {
-  return (
-    <svg viewBox="0 0 16 16" className="size-3" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true">
-      <path d="M3.5 8.5 6.5 11.5 12.5 4.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
   );
 }

@@ -5,6 +5,7 @@ import { LABEL_COLORS } from "../types";
 import { LABEL_CHIP, LABEL_SWATCH } from "../lib/labelStyles";
 import { Button, TextInput } from "./ui/controls";
 import { cn } from "../lib/cn";
+import { Check, Pencil, X } from "lucide-react";
 
 interface Props {
   labels: Label[];
@@ -91,15 +92,7 @@ export function LabelPicker({ labels, selectedIds, onToggle, onCreate, onRename,
                           <span className={cn("size-3 shrink-0 rounded-sm", LABEL_SWATCH[label.color])} />
                           <span className="text-ink flex-1 truncate">{label.name}</span>
                           {isSelected && (
-                            <svg
-                              viewBox="0 0 16 16"
-                              className="text-ink-muted size-3.5"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                            >
-                              <path d="M3.5 8.5 6.5 11.5 12.5 4.5" strokeLinecap="round" strokeLinejoin="round" />
-                            </svg>
+                            <X size={14} />
                           )}
                         </button>
                       )}
@@ -111,25 +104,9 @@ export function LabelPicker({ labels, selectedIds, onToggle, onCreate, onRename,
                         className="text-ink-faint hover:text-ink shrink-0 self-start rounded p-1"
                       >
                         {isEditing ? (
-                          <svg
-                            viewBox="0 0 16 16"
-                            className="size-3.5"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                          >
-                            <path d="M3.5 8.5 6.5 11.5 12.5 4.5" strokeLinecap="round" strokeLinejoin="round" />
-                          </svg>
+                          <Check size={14} />
                         ) : (
-                          <svg
-                            viewBox="0 0 16 16"
-                            className="size-3.5"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="1.5"
-                          >
-                            <path d="M10.5 2.5 13.5 5.5 6 13H3v-3l7.5-7.5Z" strokeLinejoin="round" />
-                          </svg>
+                          <Pencil size={14} />
                         )}
                       </button>
                     </li>
@@ -180,7 +157,7 @@ function ColorSwatches({ value, onChange }: { value: LabelColor; onChange: (colo
             "size-5 rounded transition",
             LABEL_SWATCH[color],
             value === color
-              ? "ring-ink ring-2 ring-offset-2 ring-offset-[var(--color-surface-raised)]"
+              ? "ring-ink ring-2 ring-offset-2 ring-offset-surface-raised"
               : "opacity-60 hover:opacity-100",
           )}
         />
