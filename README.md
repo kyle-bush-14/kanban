@@ -27,27 +27,34 @@ no third-party services.
 
 ## Getting started
 
-Requires Node 20.19 or newer (see `.nvmrc` — the project is developed on 24).
+Requires Node 20.19 or newer (see `.nvmrc` — the project is developed on 24) and
+a Postgres database. `docker-compose.yml` provides one.
 
 ```bash
 git clone git@github.com:kyle-bush-14/kanban.git
 cd kanban
 npm install
-npm run dev
+
+cp .env.example .env
+docker compose up -d      # Postgres on :5432
+npm run db:migrate        # create the schema
+
+npm run dev               # client on :5173, API on :3000
 ```
 
-Then open http://localhost:5173.
+Then open http://localhost:5173. A fresh database starts empty; `npm run db:seed`
+fills it with example tasks if you'd rather not start from nothing.
 
-To build and serve the production bundle:
+To build and run it for real:
 
 ```bash
 npm run build
-npm run preview
+npm start                 # serves the API and the built client on :3000
 ```
 
-`npm run build` emits a static `dist/` directory. It's a plain SPA with no
-server component, so you can host it behind any static file server — nginx,
-Caddy, a container, or a folder on a NAS.
+`npm start` runs a single Node process that serves both `/rpc` and the built
+`dist/`, so self-hosting is that process plus a Postgres instance. Migrations run
+automatically on boot.
 
 ## Using the board
 
@@ -66,27 +73,36 @@ just a name.
 
 ## Current status
 
-**Nothing is persisted yet.** The board loads from a seed set of example tasks
-and resets when you reload the page. State is already kept as one serializable
-object specifically so a storage layer can be added without reworking the UI —
-that's the next piece of work.
+Your board is stored in Postgres and survives reloads. Edits save automatically:
+the UI updates immediately and persistence follows in the background, so typing
+and dragging never wait on the network. A badge appears in the corner if a save
+fails.
 
-Also not built yet: multiple boards, card archiving, search and filtering, and
-any kind of sync between devices.
+Not built yet: multiple boards, card archiving, search and filtering, undo
+history, authentication, and live sync between devices or browser tabs — two
+tabs open on the same board will overwrite each other.
 
 ## Development
 
 ```bash
-npm run dev           # dev server on :5173
+npm run dev           # client on :5173 and API on :3000 together
+npm run dev:client    # just Vite
+npm run dev:server    # just the API, with --watch
 npm run build         # type-check and build for production
 npm run typecheck     # type-check only
 npm run lint          # eslint
 npm run format        # rewrite files with prettier
 npm run format:check  # check formatting without writing
+npm test              # node's built-in test runner; no database needed
+
+npm run db:generate   # create a migration from schema changes
+npm run db:migrate    # apply migrations
+npm run db:studio     # browse the data
+npm run db:seed       # example tasks, only into an empty board
 ```
 
-CI runs `format:check`, `lint`, and `build` on every pull request to `main`.
-There is no test suite yet.
+CI runs `format:check`, `lint`, `build` and `test` on every pull request to
+`main`.
 
 ### Stack
 
@@ -95,14 +111,25 @@ React 19, TypeScript, and Vite 8, with Tailwind v4 for styling.
 and number-field primitives, [@dnd-kit/react](https://next.dndkit.com) handles
 dragging, plus lucide-react for icons and canvas-confetti for the celebration.
 
+The backend is [oRPC](https://orpc.dev) over Postgres via
+[Drizzle](https://orm.drizzle.team), served from a plain `node:http` server. It
+runs TypeScript directly — Node strips the types, so there's no server build
+step.
+
 ### Layout
 
 ```
+shared/          types and zod schemas used by both sides
 src/
-  types.ts       shared types — columns, tasks, labels
-  state/         board reducer and the seed board
-  lib/           class names, date formatting, label styles, confetti
+  types.ts       re-exports the shared types, plus UI-only constants
+  state/         board reducer and the sync layer
+  lib/           API client, class names, dates, label styles, confetti
   components/    Board, Column, TaskCard, TaskDialog, and friends
+server/
+  index.ts       migrate, then listen
+  app.ts         request routing: /rpc, then static files
+  router.ts      the oRPC procedures
+  db/            drizzle schema and queries
 ```
 
 If you're making changes — or pointing a coding agent at this repo — read
