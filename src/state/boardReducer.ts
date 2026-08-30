@@ -7,6 +7,7 @@ import type { BoardState, ChecklistItem, ColumnId, Label, Task } from "../types"
  * pure and deterministic — no `crypto.randomUUID()` or `Date.now()` in here.
  */
 export type BoardAction =
+  | { type: "load"; state: BoardState }
   | { type: "set-columns"; columns: Record<ColumnId, string[]> }
   | { type: "drag-over"; event: DragOverEvent }
   | { type: "create-task"; id: string; column: ColumnId; name: string }
@@ -17,7 +18,7 @@ export type BoardAction =
   | { type: "remove-checklist-item"; taskId: string; itemId: string }
   | { type: "create-label"; label: Label; taskId?: string }
   | { type: "update-label"; id: string; changes: Partial<Omit<Label, "id">> }
-  | { type: "toggle-task-label"; taskId: string; labelId: string };
+  | { type: "toggle-task-label"; taskId: string; labelId: string; applied: boolean };
 
 function updateTask(state: BoardState, id: string, update: (task: Task) => Task): BoardState {
   const task = state.tasks[id];
@@ -35,6 +36,10 @@ function updateChecklist(
 
 export function boardReducer(state: BoardState, action: BoardAction): BoardState {
   switch (action.type) {
+    /** Replace the board wholesale with what the server returned. */
+    case "load":
+      return action.state;
+
     /**
      * Reorder optimistically as a card is dragged. Doing this in the reducer
      * rather than the event handler guarantees `move` always sees the current
@@ -111,9 +116,11 @@ export function boardReducer(state: BoardState, action: BoardAction): BoardState
     case "toggle-task-label":
       return updateTask(state, action.taskId, (task) => ({
         ...task,
-        labelIds: task.labelIds.includes(action.labelId)
-          ? task.labelIds.filter((id) => id !== action.labelId)
-          : [...task.labelIds, action.labelId],
+        labelIds: action.applied
+          ? task.labelIds.includes(action.labelId)
+            ? task.labelIds
+            : [...task.labelIds, action.labelId]
+          : task.labelIds.filter((id) => id !== action.labelId),
       }));
 
     default:

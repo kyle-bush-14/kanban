@@ -10,7 +10,7 @@ import { Check, Pencil } from "lucide-react";
 interface Props {
   labels: Label[];
   selectedIds: string[];
-  onToggle: (labelId: string) => void;
+  onToggle: (labelId: string, applied: boolean) => void;
   onCreate: (name: string, color: LabelColor) => void;
   onRename: (labelId: string, name: string) => void;
   onRecolor: (labelId: string, color: LabelColor) => void;
@@ -84,7 +84,7 @@ export function LabelPicker({ labels, selectedIds, onToggle, onCreate, onRename,
                       ) : (
                         <button
                           type="button"
-                          onClick={() => onToggle(label.id)}
+                          onClick={() => onToggle(label.id, !isSelected)}
                           aria-pressed={isSelected}
                           className={cn(
                             "hover:bg-surface-hover flex flex-1 items-center gap-2 rounded px-1.5 py-1 text-left text-sm transition-colors",
