@@ -6,9 +6,9 @@ import tseslint from "typescript-eslint";
 import { defineConfig, globalIgnores } from "eslint/config";
 
 export default defineConfig([
-  globalIgnores(["dist"]),
+  globalIgnores(["dist", "drizzle"]),
   {
-    files: ["**/*.{ts,tsx}"],
+    files: ["src/**/*.{ts,tsx}", "shared/**/*.ts"],
     extends: [
       js.configs.recommended,
       tseslint.configs.recommended,
@@ -17,6 +17,14 @@ export default defineConfig([
     ],
     languageOptions: {
       globals: globals.browser,
+    },
+  },
+  {
+    // Server and tooling run in Node, not the browser, and have no React rules.
+    files: ["server/**/*.ts", "scripts/**/*.ts", "*.config.ts"],
+    extends: [js.configs.recommended, tseslint.configs.recommended],
+    languageOptions: {
+      globals: globals.node,
     },
   },
 ]);

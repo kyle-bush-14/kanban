@@ -43,3 +43,7 @@ jobs:
       # `build` runs `tsc -b` before Vite, so this also type-checks the project.
       - name: Build
         run: npm run build
+
+      # Node's built-in runner; no database required.
+      - name: Test
+        run: npm test

@@ -1,12 +1,15 @@
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { DragDropProvider, DragOverlay, KeyboardSensor, PointerSensor } from "@dnd-kit/react";
 import { boardReducer, findColumn } from "../state/boardReducer";
-import { createSeedBoard } from "../state/seed";
+import { emptyBoard } from "../state/emptyBoard";
+import { sync, useSyncedDispatch } from "../state/sync";
+import { api } from "../lib/api";
 import type { ColumnId } from "../types";
 import { COLUMNS, DONE_COLUMN } from "../types";
 import { Column } from "./Column";
 import { TaskCardContent } from "./TaskCard";
 import { TaskDialog } from "./TaskDialog";
+import { SyncIndicator } from "./SyncIndicator";
 import { celebrate } from "../lib/confetti";
 
 /**
@@ -28,8 +31,13 @@ const SENSORS = [
   }),
 ];
 
+type LoadState = "loading" | "ready" | "failed";
+
 export function Board() {
-  const [state, dispatch] = useReducer(boardReducer, undefined, createSeedBoard);
+  const [state, rawDispatch] = useReducer(boardReducer, undefined, emptyBoard);
+  const dispatch = useSyncedDispatch(rawDispatch);
+
+  const [loadState, setLoadState] = useState<LoadState>("loading");
   const [openTaskId, setOpenTaskId] = useState<string | null>(null);
   const [draggingId, setDraggingId] = useState<string | null>(null);
 
@@ -37,6 +45,34 @@ export function Board() {
   const preDragColumnsRef = useRef(state.columns);
   // The Done column as it stood before the in-flight drag began.
   const settledDoneRef = useRef(state.columns[DONE_COLUMN]);
+  // Ordering as last persisted, so we only send a reorder when it really changed.
+  const persistedColumnsRef = useRef(state.columns);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    api.board
+      .get()
+      .then((board) => {
+        if (cancelled) return;
+        rawDispatch({ type: "load", state: board });
+        // Loading is not a user edit: prime the refs so it neither fires
+        // confetti nor writes the board straight back to the server.
+        settledDoneRef.current = board.columns[DONE_COLUMN];
+        persistedColumnsRef.current = board.columns;
+        preDragColumnsRef.current = board.columns;
+        setLoadState("ready");
+      })
+      .catch((error) => {
+        if (cancelled) return;
+        console.error("Could not load the board:", error);
+        setLoadState("failed");
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   /**
    * Celebrate tasks that *entered* Done, diffed against the last settled state.
@@ -59,16 +95,52 @@ export function Board() {
     }
   }, [draggingId, state.columns]);
 
+  /**
+   * Persist ordering once the drag settles. `drag-over` fires many times per
+   * drag, so this deliberately reuses the same settled-state gate as the
+   * confetti effect rather than saving from a drag handler.
+   */
+  useEffect(() => {
+    if (loadState !== "ready" || draggingId !== null) return;
+    if (persistedColumnsRef.current === state.columns) return;
+
+    persistedColumnsRef.current = state.columns;
+    sync.reorder(state.columns);
+  }, [draggingId, state.columns, loadState]);
+
+  // Don't lose an in-flight debounced edit if the tab is closed mid-typing.
+  useEffect(() => {
+    const flush = () => sync.flushAll();
+    window.addEventListener("beforeunload", flush);
+    return () => window.removeEventListener("beforeunload", flush);
+  }, []);
+
   const openTask = useCallback((taskId: string) => setOpenTaskId(taskId), []);
   const closeDialog = useCallback(() => setOpenTaskId(null), []);
 
-  const addTask = useCallback((column: ColumnId) => {
-    const id = crypto.randomUUID();
-    dispatch({ type: "create-task", id, column, name: "" });
-    setOpenTaskId(id);
-  }, []);
+  const addTask = useCallback(
+    (column: ColumnId) => {
+      const id = crypto.randomUUID();
+      dispatch({ type: "create-task", id, column, name: "" });
+      setOpenTaskId(id);
+    },
+    [dispatch],
+  );
 
   const openTaskColumn = openTaskId ? findColumn(state.columns, openTaskId) : undefined;
+
+  if (loadState === "loading") {
+    return <BoardMessage>Loading your board…</BoardMessage>;
+  }
+
+  if (loadState === "failed") {
+    return (
+      <BoardMessage>
+        <span className="text-overdue font-medium">Couldn&rsquo;t reach the server.</span>
+        <span className="mt-1 block">Check that the API and database are running, then reload.</span>
+      </BoardMessage>
+    );
+  }
 
   return (
     <DragDropProvider
@@ -100,6 +172,8 @@ export function Board() {
         ))}
       </div>
 
+      <SyncIndicator />
+
       <DragOverlay>
         {draggingId && state.tasks[draggingId] ? (
           <div className="bg-surface-raised border-line-strong rounded-card w-72 rotate-2 border p-3 shadow-2xl">
@@ -120,5 +194,13 @@ export function Board() {
         onClose={closeDialog}
       />
     </DragDropProvider>
+  );
+}
+
+function BoardMessage({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="text-ink-muted flex flex-1 items-center justify-center p-8 text-center text-sm">
+      <p>{children}</p>
+    </div>
   );
 }

@@ -130,7 +130,7 @@ function TaskDialogBody({
         <LabelPicker
           labels={labels}
           selectedIds={task.labelIds}
-          onToggle={(labelId) => dispatch({ type: "toggle-task-label", taskId: task.id, labelId })}
+          onToggle={(labelId, applied) => dispatch({ type: "toggle-task-label", taskId: task.id, labelId, applied })}
           onCreate={(name, color: LabelColor) =>
             dispatch({
               type: "create-label",
